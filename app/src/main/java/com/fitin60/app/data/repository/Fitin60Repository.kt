@@ -10,7 +10,6 @@ import com.fitin60.app.data.local.WeeklyCheckinDao
 import com.fitin60.app.data.local.WeeklyCheckinEntity
 import com.fitin60.app.data.parser.PlanParseResult
 import com.fitin60.app.data.parser.PlanParser
-import com.fitin60.app.data.parser.SeedPlan
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 import java.util.UUID
@@ -31,10 +30,6 @@ class Fitin60Repository(
     fun observeCompletedCount(): Flow<Int> = dayPlanDao.observeCompletedCount()
 
     suspend fun hasProgram(): Boolean = programDao.getActive() != null
-
-    suspend fun startWithSeed() {
-        replaceProgram(SeedPlan.PROGRAM_NAME, SeedPlan.build())
-    }
 
     suspend fun importPlan(rawInput: String): PlanParseResult {
         val result = PlanParser.parse(rawInput)

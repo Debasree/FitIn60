@@ -3,15 +3,43 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Outer glow ring -->
+    <path
+        android:strokeColor="#4422D3EE"
+        android:strokeWidth="5"
+        android:fillColor="#00000000"
+        android:pathData="M54,16 a38,38 0 1,0 0.01,0 Z"/>
+
+    <!-- Inner bright ring (sphere rim highlight) -->
+    <path
+        android:strokeColor="#9922D3EE"
+        android:strokeWidth="2"
+        android:fillColor="#00000000"
+        android:pathData="M54,22 a32,32 0 1,0 0.01,0 Z"/>
+
+    <!-- Bottom-right darker arc for depth illusion -->
+    <path
+        android:strokeColor="#220C4A6E"
+        android:strokeWidth="16"
+        android:fillColor="#00000000"
+        android:pathData="M32,76 a32,32 0 0,0 44,4"/>
+
+    <!-- Top-left highlight arc -->
+    <path
+        android:strokeColor="#5567E8F9"
+        android:strokeWidth="7"
+        android:fillColor="#00000000"
+        android:pathData="M28,36 a32,32 0 0,1 20,-16"/>
+
+    <!-- Lightning bolt body -->
     <path
         android:fillColor="#22D3EE"
-        android:pathData="M54,30 L54,78 M30,54 L78,54"
-        android:strokeColor="#22D3EE"
-        android:strokeWidth="6"
-        android:strokeLineCap="round" />
+        android:pathData="M59,26 L41,54 L51,54 L49,82 L67,54 L57,54 Z"/>
+
+    <!-- Lightning bolt inner highlight -->
     <path
-        android:fillColor="#22D3EE"
-        android:pathData="M54,54 m-22,0 a22,22 0 1,0 44,0 a22,22 0 1,0 -44,0"
-        android:strokeColor="#A7F3D0"
-        android:strokeWidth="4" />
+        android:fillColor="#99FFFFFF"
+        android:pathData="M57,30 L43,54 L51,54 L50,72 L62,54 L54,54 Z"/>
+
 </vector>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,7 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bedtime
-import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,7 +44,7 @@ import java.util.Date
 fun SettingsScreen(
     viewModel: Fitin60ViewModel,
     onBack: () -> Unit,
-    onReset: () -> Unit,
+    onStartAgain: () -> Unit,
 ) {
     val state by viewModel.homeState.collectAsStateWithLifecycle()
     var showConfirm by remember { mutableStateOf(false) }
@@ -54,14 +55,16 @@ fun SettingsScreen(
         onBack = onBack,
     ) { _ ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             PrimaryCard(modifier = Modifier.fillMaxWidth()) {
                 Column {
                     SectionLabel("Active program")
                     Text(
-                        state.program?.name ?: "None",
+                        state.program?.name ?: "No program",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
@@ -69,36 +72,43 @@ fun SettingsScreen(
                     Text(
                         state.program?.startedAtMillis?.let {
                             "Started " + DateFormat.getDateInstance().format(Date(it))
-                        } ?: "No program in progress.",
+                        } ?: "Import a 60-day plan to get started.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
-                    VSpacer(8)
-                    Text(
-                        "Day ${state.currentDay ?: "-"} of 60",
-                        style = MaterialTheme.typography.titleMedium,
-                    )
+                    if (state.currentDay != null) {
+                        VSpacer(8)
+                        Text(
+                            "Day ${state.currentDay} of 60",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
                 }
             }
 
-            PrimaryCard(modifier = Modifier.fillMaxWidth().clickable { showConfirm = true }) {
+            PrimaryCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showConfirm = true },
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Rounded.Refresh,
+                        Icons.Rounded.RestartAlt,
                         contentDescription = null,
                         tint = Coral500,
                         modifier = Modifier.size(28.dp),
                     )
-                    androidx.compose.foundation.layout.Spacer(Modifier.size(12.dp))
+                    Spacer(Modifier.size(12.dp))
                     Column(Modifier.weight(1f)) {
                         Text(
-                            "Reset program",
+                            "Start Again",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold,
                             color = Coral500,
                         )
                         Text(
-                            "Deletes all 60 days, check-ins and photos.",
+                            "Factory reset — deletes your plan, check-ins, and photos.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -114,7 +124,7 @@ fun SettingsScreen(
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp),
                     )
-                    androidx.compose.foundation.layout.Spacer(Modifier.size(12.dp))
+                    Spacer(Modifier.size(12.dp))
                     Column {
                         Text(
                             "Offline first",
@@ -135,18 +145,22 @@ fun SettingsScreen(
     if (showConfirm) {
         AlertDialog(
             onDismissRequest = { showConfirm = false },
-            title = { Text("Reset program?", fontWeight = FontWeight.Bold) },
-            text = { Text("This will delete your current 60-day plan, all check-ins, and photos.") },
+            title = { Text("Start Again?", fontWeight = FontWeight.Bold) },
+            text = {
+                Text("This wipes your current 60-day plan, all weekly check-ins, and photos. You will be asked to import a new plan.")
+            },
             confirmButton = {
                 Button(
                     onClick = {
                         showConfirm = false
-                        onReset()
+                        onStartAgain()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Coral500),
                     modifier = Modifier.height(48.dp),
                     shape = RoundedCornerShape(16.dp),
-                ) { Text("Reset", fontWeight = FontWeight.SemiBold) }
+                ) {
+                    Text("Start Again", fontWeight = FontWeight.SemiBold)
+                }
             },
             dismissButton = {
                 TextButton(onClick = { showConfirm = false }) { Text("Cancel") }

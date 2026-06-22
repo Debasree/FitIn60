@@ -27,18 +27,13 @@ fun Fitin60NavGraph(viewModel: Fitin60ViewModel) {
     val start = if (hasProgram == true) Destinations.Today else Destinations.Onboarding
 
     NavHost(navController = navController, startDestination = start) {
+
         composable(Destinations.Onboarding) {
             OnboardingScreen(
                 onGetStarted = { navController.navigate(Destinations.Import) },
-                onUseSample = {
-                    viewModel.useSamplePlan {
-                        navController.navigate(Destinations.Today) {
-                            popUpTo(Destinations.Onboarding) { inclusive = true }
-                        }
-                    }
-                },
             )
         }
+
         composable(Destinations.Import) {
             ImportPlanScreen(
                 viewModel = viewModel,
@@ -46,6 +41,7 @@ fun Fitin60NavGraph(viewModel: Fitin60ViewModel) {
                 onBack = { navController.popBackStack() },
             )
         }
+
         composable(Destinations.Preview) {
             PlanPreviewScreen(
                 viewModel = viewModel,
@@ -59,6 +55,7 @@ fun Fitin60NavGraph(viewModel: Fitin60ViewModel) {
                 onBack = { navController.popBackStack() },
             )
         }
+
         composable(Destinations.Today) {
             TodayScreen(
                 viewModel = viewModel,
@@ -69,6 +66,7 @@ fun Fitin60NavGraph(viewModel: Fitin60ViewModel) {
                 onOpenDay = { day -> navController.navigate(Destinations.dayDetail(day)) },
             )
         }
+
         composable(Destinations.Calendar) {
             CalendarScreen(
                 viewModel = viewModel,
@@ -76,6 +74,7 @@ fun Fitin60NavGraph(viewModel: Fitin60ViewModel) {
                 onBack = { navController.popBackStack() },
             )
         }
+
         composable(
             route = Destinations.DayDetail,
             arguments = listOf(navArgument("day") { type = NavType.IntType }),
@@ -87,23 +86,26 @@ fun Fitin60NavGraph(viewModel: Fitin60ViewModel) {
                 onBack = { navController.popBackStack() },
             )
         }
+
         composable(Destinations.Weekly) {
             WeeklyCheckinScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
             )
         }
+
         composable(Destinations.Progress) {
             ProgressScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
             )
         }
+
         composable(Destinations.Settings) {
             SettingsScreen(
                 viewModel = viewModel,
                 onBack = { navController.popBackStack() },
-                onReset = {
+                onStartAgain = {
                     viewModel.resetProgram {
                         navController.navigate(Destinations.Onboarding) {
                             popUpTo(0) { inclusive = true }

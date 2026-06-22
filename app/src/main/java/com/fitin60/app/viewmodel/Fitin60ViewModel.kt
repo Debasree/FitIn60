@@ -110,13 +110,6 @@ class Fitin60ViewModel(
         }
     }
 
-    fun useSamplePlan(onDone: () -> Unit) {
-        viewModelScope.launch {
-            repository.startWithSeed()
-            onDone()
-        }
-    }
-
     fun resetProgram(onDone: () -> Unit) {
         viewModelScope.launch {
             repository.resetProgram()
