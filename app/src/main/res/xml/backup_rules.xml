@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <include domain="database" path="fitin60.db" />
+    <include domain="file" path="checkin_photos/" />
+</full-backup-content>

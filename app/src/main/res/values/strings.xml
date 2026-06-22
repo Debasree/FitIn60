@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Fitin60</string>
+    <string name="onboarding_title">Transform in 60 days</string>
+    <string name="onboarding_subtitle">A focused, daily plan for sleep, food and movement.</string>
+    <string name="onboarding_cta">Get Started</string>
+    <string name="use_sample_plan">Use sample plan</string>
+    <string name="import_my_plan">Import my plan</string>
+    <string name="paste_plan_hint">Paste JSON or markdown plan here…</string>
+    <string name="parse_plan">Parse plan</string>
+    <string name="reset_program">Reset Program</string>
+    <string name="reset_confirm">Are you sure? This deletes all progress.</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+</resources>
