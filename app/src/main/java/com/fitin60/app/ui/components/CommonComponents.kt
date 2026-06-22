@@ -2,6 +2,7 @@ package com.fitin60.app.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.runtime.getValue
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.fitin60.app.ui.theme.Mint300
 import com.fitin60.app.ui.theme.Mint500
@@ -171,7 +173,7 @@ fun BigDayBadge(day: Int, total: Int = 60, modifier: Modifier = Modifier) {
 fun CircularProgress(
     fraction: Float,
     modifier: Modifier = Modifier,
-    size: androidx.compose.ui.unit.Dp = 84.dp,
+    size: Dp = 84.dp,
     label: String? = null,
 ) {
     val animated by animateFloatAsState(targetValue = fraction.coerceIn(0f, 1f), label = "progress")
