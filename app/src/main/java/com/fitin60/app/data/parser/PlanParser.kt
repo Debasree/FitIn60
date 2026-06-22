@@ -2,6 +2,13 @@ package com.fitin60.app.data.parser
 
 import com.fitin60.app.data.local.DayPlanEntity
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 sealed interface PlanParseResult {
     data class Success(
@@ -37,20 +44,53 @@ object PlanParser {
         )
     }
 
+    // Manual JSON parsing so we can handle "day" as an Int (7) or a range string ("1-6").
     private fun tryJson(input: String): PlanParseResult {
         return try {
-            val dto = json.decodeFromString(PlanDto.serializer(), input)
-            if (dto.days.isEmpty()) {
-                PlanParseResult.Failure("JSON plan has no days.")
-            } else {
-                val normalized = normalize(dto.days)
-                PlanParseResult.Success(
-                    programName = dto.programName.ifBlank { "Fit in 60" },
-                    days = normalized,
-                )
+            val root = json.parseToJsonElement(input).jsonObject
+            val programName = root["programName"]?.jsonPrimitive?.contentOrNull ?: "Fit in 60"
+            val daysArr = root["days"]?.jsonArray
+                ?: return PlanParseResult.Failure("JSON has no 'days' array.")
+            if (daysArr.isEmpty()) return PlanParseResult.Failure("JSON plan has no days.")
+
+            val expanded = mutableListOf<DayDto>()
+            for (elem in daysArr) {
+                val obj = elem as? JsonObject ?: continue
+                val dayElem = obj["day"] ?: continue
+                val dayNums = parseDayNumbers(dayElem)
+                if (dayNums.isEmpty()) continue
+                val sleep = obj["sleep"]?.jsonPrimitive?.contentOrNull ?: ""
+                val meals = obj["meals"]?.jsonArray
+                    ?.mapNotNull { it.jsonPrimitive.contentOrNull } ?: emptyList()
+                val workout = obj["workout"]?.jsonArray
+                    ?.mapNotNull { it.jsonPrimitive.contentOrNull } ?: emptyList()
+                val notes = obj["notes"]?.jsonPrimitive?.contentOrNull ?: ""
+                for (dayNum in dayNums) {
+                    expanded.add(DayDto(day = dayNum, sleep = sleep, meals = meals, workout = workout, notes = notes))
+                }
             }
+
+            if (expanded.isEmpty()) return PlanParseResult.Failure("No valid days could be parsed from JSON.")
+
+            PlanParseResult.Success(
+                programName = programName.ifBlank { "Fit in 60" },
+                days = normalize(expanded),
+            )
         } catch (t: Throwable) {
             PlanParseResult.Failure(t.message ?: "JSON parse error")
+        }
+    }
+
+    private fun parseDayNumbers(element: JsonElement): List<Int> {
+        if (element !is JsonPrimitive) return emptyList()
+        val content = element.content
+        return if ('-' in content) {
+            val parts = content.split('-')
+            val start = parts.getOrNull(0)?.trim()?.toIntOrNull() ?: return emptyList()
+            val end = parts.getOrNull(1)?.trim()?.toIntOrNull() ?: return emptyList()
+            if (start <= end) (start..end).toList() else emptyList()
+        } else {
+            content.toIntOrNull()?.let { listOf(it) } ?: emptyList()
         }
     }
 
@@ -147,15 +187,17 @@ object PlanParser {
     }
 
     private fun normalize(days: List<DayDto>): List<DayPlanEntity> {
-        val byDay = days
-            .filter { it.day in 1..60 }
-            .associateBy { it.day }
-            .toSortedMap()
+        val byDay = sortedMapOf<Int, DayDto>()
+        for (dto in days) {
+            // First entry for each day wins (preserves original ordering intent for ranges).
+            if (dto.day in 1..60 && !byDay.containsKey(dto.day)) byDay[dto.day] = dto
+        }
+        if (byDay.isEmpty()) return emptyList()
 
         val result = mutableListOf<DayPlanEntity>()
-        var last: DayDto? = null
+        var last: DayDto = byDay.values.first()
         for (day in 1..60) {
-            val dto = byDay[day] ?: last?.copy(day = day) ?: DayDto(day = day)
+            val dto = byDay[day] ?: last
             last = dto
             result.add(
                 DayPlanEntity(
