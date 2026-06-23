@@ -204,11 +204,27 @@ object PlanParser {
                     dayNumber = day,
                     sleep = dto.sleep.trim(),
                     meals = dto.meals.map { it.trim() }.filter { it.isNotEmpty() },
-                    workout = dto.workout.map { it.trim() }.filter { it.isNotEmpty() },
+                    workout = extractDayItems(dto.workout, day),
                     notes = dto.notes.trim(),
                 )
             )
         }
         return result
+    }
+
+    // Matches "Day N: ..." items and, when present, returns only the entry for `dayNumber`.
+    // If the list has no such labels (plain workout list), returns everything unchanged.
+    private val dayItemPrefix = Regex("^Day\\s+(\\d+)\\s*:\\s*(.+)$", RegexOption.IGNORE_CASE)
+
+    private fun extractDayItems(items: List<String>, dayNumber: Int): List<String> {
+        val trimmed = items.map { it.trim() }.filter { it.isNotEmpty() }
+        val hasLabels = trimmed.any { dayItemPrefix.matches(it) }
+        if (!hasLabels) return trimmed
+
+        val matched = trimmed.mapNotNull { item ->
+            val m = dayItemPrefix.matchEntire(item) ?: return@mapNotNull null
+            if (m.groupValues[1].toIntOrNull() == dayNumber) m.groupValues[2].trim() else null
+        }
+        return matched.ifEmpty { trimmed }
     }
 }

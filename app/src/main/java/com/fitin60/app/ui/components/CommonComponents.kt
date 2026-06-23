@@ -55,7 +55,11 @@ fun ScreenScaffold(
             ) {
                 if (onBack != null) {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Rounded.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Rounded.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onBackground,
+                        )
                     }
                 } else {
                     Spacer(Modifier.width(16.dp))
@@ -65,6 +69,7 @@ fun ScreenScaffold(
                         text = title,
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.ExtraBold,
+                        color = MaterialTheme.colorScheme.onBackground,
                     )
                     if (subtitle != null) {
                         Text(
@@ -151,18 +156,18 @@ fun BigDayBadge(day: Int, total: Int = 60, modifier: Modifier = Modifier) {
                 Text(
                     "DAY",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                 )
                 Text(
                     text = day.toString(),
                     style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                     fontWeight = FontWeight.Black,
                 )
                 Text(
                     "of $total",
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
+                    color = Color.White,
                 )
             }
         }
